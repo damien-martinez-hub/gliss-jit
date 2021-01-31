@@ -17,6 +17,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *)
 
+open IrgCommon
 open Printf
 
 exception UnsupportedType of Irg.type_expr
@@ -156,6 +157,7 @@ type info_t = {
 	mutable ppc_name: string;		(** name of the register used as previous instruction PC (marked as __attr(ppc)) *)
 	mutable npc_name: string;		(** name of the register used as next instruction PC (marked as __attr(npc)) *)
 	mutable indent: int;			(** identation level *)
+	mutable ndebug: bool;			(** if set, no debugging code is generated *)
 }
 
 
@@ -223,6 +225,7 @@ let info _ =
 		npc_name = get_reg_name "npc";
 		ppc_name = get_reg_name "ppc";
 		indent = 1;
+		ndebug = false
 	}
 
 
@@ -1553,11 +1556,16 @@ let rec gen_stat info stat =
 				assert false)
 
 	| Irg.CANON_STAT (name, args) ->
-		line (fun _ ->
-			out name;
-			out "(";
-			iter_args args;
-			out ");")
+		if name <> "$gliss_assert" || not info.ndebug then
+			let name =
+				if starts_with name "$gliss_"
+				then info.proc ^ (tail name 6)
+				else name in
+			line (fun _ ->
+				out name;
+				out "(";
+				iter_args args;
+				out ");")
 
 	| Irg.ERROR msg ->
 		line (fun _ ->

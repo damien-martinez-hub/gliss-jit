@@ -22,7 +22,7 @@
 #define GLISS_ENV_EMBEDDED_H
 
 #include "api.h"
-#include "loader.h"
+//#include "loader.h"
 #include "config.h"
 
 __BEGIN_DECLS
@@ -34,7 +34,7 @@ __BEGIN_DECLS
 
 
 /* system initialization (used internally during platform and state initialization) */
-void gliss_stack_fill_env(gliss_loader_t *loader,  gliss_platform_t *platform, gliss_env_t *env);
+void gliss_stack_fill_env(struct gliss_loader_t *loader,  gliss_platform_t *platform, gliss_env_t *env);
 void gliss_registers_fill_env(gliss_env_t *env, gliss_state_t *state);
 
 __END_DECLS

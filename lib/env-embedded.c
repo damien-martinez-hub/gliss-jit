@@ -20,7 +20,7 @@
  */
 
 #include <gliss/api.h>
-#include <gliss/loader.h>
+//#include <gliss/loader.h>
 
 /**
  * system initialization of the stack, program arguments, environment and auxilliar
@@ -30,7 +30,7 @@
  * @param	env	contains the data to write in the stack, the addresses of written data are stored in it by the function.
  *
  */
-void gliss_stack_fill_env(gliss_loader_t *loader, gliss_platform_t *platform, gliss_env_t *env) {
+void gliss_stack_fill_env(struct gliss_loader_t *loader, gliss_platform_t *platform, gliss_env_t *env) {
 }
 
 

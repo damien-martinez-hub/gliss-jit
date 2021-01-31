@@ -74,7 +74,6 @@
 	- {!check_attr_inst}
 	- {!check_constant_type}
 	- {!check_expr_inst}
-	- {!check_if_expr}
 	- {!check_image}
 	- {!check_loc_inst}
 	- {!check_param_exists}
@@ -1984,7 +1983,7 @@ let make_if_expr cond e1 e2 =
 	if t1 = t2 then IF_EXPR (t1, cond, e1, e2) else
 	let (t, e1, e2) = num_auto_coerce e1 e2 in
 	if t <> NO_TYPE then IF_EXPR (t, cond, e1, e2) else
-	error_two_operands "if" e1 e2
+	error_two_operands "if" e1 e2	
 
 
 (** Build a switch expression.
@@ -2803,4 +2802,35 @@ let make_enum_values vs =
 	if (Int32.compare (List.hd vs) Int32.zero) < 0
 	then error (fun out -> fprintf out "negative values forbidden in enumerated");
 	vs
-	
+
+
+(** Transform, if needed, e as a valid condition.
+	@param e	Expression sed as a condition.
+	@return		e as a condition. *)	
+let make_condition e =
+	match get_type_expr e with
+	| BOOL
+	| INT _
+	| CARD _
+	| RANGE _
+	| ENUM _
+	| ANY_TYPE	->
+		e
+	| STRING	->
+		expr_error e (asis "cannot be casted to a condition")
+	| _			->
+		snd (coerce_to_int e (CARD(32)))
+
+
+(** Build an assert statement.
+	@param cond		Condition of the assertion.
+	@param file		Source file containing the assertion.
+	@param line		Source file line.
+	@return			Assertion instruction. *)
+let make_assert cond file line =
+	CANON_STAT("$gliss_assert", [
+		CONST (NO_TYPE, CANON "state");
+		make_condition cond;
+		CONST (STRING, STRING_CONST file);
+		CONST (CARD(32), CARD_CONST (Int32.of_int line))
+	])

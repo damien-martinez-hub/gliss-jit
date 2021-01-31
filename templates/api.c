@@ -55,6 +55,7 @@ unsigned long $(proc)_get_inst_size($(proc)_inst_t* inst) {
  */
 $(proc)_platform_t *$(proc)_new_platform(void) {
 	$(proc)_platform_t *pf;
+	char *assert;
 
 	/* allocation */
 	pf = ($(proc)_platform_t *)calloc(1, sizeof($(proc)_platform_t));
@@ -66,7 +67,6 @@ $(proc)_platform_t *$(proc)_new_platform(void) {
 	pf->usage = 0;
 
 	/* other init */
-	/*pf->entry = pf->sp = pf->argv = pf->envp = pf->aux = pf->argc = 0;*/
 	pf->sys_env = calloc(1, sizeof($(proc)_env_t));
 	if(pf->sys_env == NULL) {
 		errno = ENOMEM;
@@ -88,6 +88,11 @@ $(end)
 $(foreach modules)
 	$(PROC)_$(NAME)_INIT(pf);
 $(end)
+
+	/* assertion check */
+	assert = getenv("GLISS_NDEBUG");
+	if(assert != NULL && strcasecmp(assert, "yes") == 0)
+		$(proc)_assert_enable = 0;
 
 	/* return platform */
 	return pf;
@@ -166,54 +171,6 @@ $(end)
 	free(platform);
 	platform = NULL;
 }
-
-
-/**
- * Load the program from the given loader.
- * @param platform		Platform.
- * @param loader		Loader to get program from.
- */
-void $(proc)_load($(proc)_platform_t *platform, $(proc)_loader_t *loader) {
-	assert(platform);
-
-	/* load in platform's memory */
-	$(proc)_loader_load(loader, platform);
-
-	/* initialize system information */
-	platform->entry = $(proc)_loader_start(loader);
-	$(proc)_set_brk(platform, $(proc)_brk_init(loader));
-
-	/* !!TODO!! add argc,argv... init */
-	/* stack initialization */
-	$(proc)_stack_fill_env(loader, platform, platform->sys_env);
-}
-
-
-/**
- * Load the given program in the platform and initialize stack
- * @param platform	Platform to load in.
- * @param path		Path of the file to load.
- * @return			0 for success, -1 for error (in errno).
- */
-int $(proc)_load_platform($(proc)_platform_t *platform, const char *path) {
-	$(proc)_loader_t *loader;
-	assert(platform);
-
-	/* open the file */
-	loader = $(proc)_loader_open(path);
-	if(loader == NULL)
-		return -1;
-
-	/* load in platform's memory */
-	$(proc)_load(platform, loader);
-
-	/* close the file */
-	$(proc)_loader_close(loader);
-
-	/* return success */
-	return 0;
-}
-
 
 
 /* state management function */
@@ -1089,3 +1046,75 @@ $(else)
 	{ "$(proc)", $(proc)_decode },
 $(end)	{ 0, 0 }
 };
+
+
+/**
+ * Boolean value indicating if assertion are tested are not.
+ */
+int $(proc)_assert_enable = 1;
+
+
+/**
+ * Test the given assertion.
+ * @param state	Current state.
+ * @param cond	Condition of the assertion.
+ * @param file	Source file of the assertion.
+ * @param line	Source line of the assertion.
+ */
+void $(proc)_assert($(proc)_state_t *state, int cond, const char *file, int line) {
+	if($(proc)_assert_enable && !cond) {
+		$(proc)_dump_state(state, stderr);
+		fprintf(stderr, "Assertion failure at %s:%d\n", file, line);
+	}
+}
+
+
+/****** convenience function only defined if a loader is available ******/
+
+#ifdef $(PROC)_LOADER_STATE
+/**
+ * Load the program from the given loader.
+ * @param platform		Platform.
+ * @param loader		Loader to get program from.
+ */
+void $(proc)_load($(proc)_platform_t *platform, struct $(proc)_loader_t *loader) {
+	assert(platform);
+
+	/* load in platform's memory */
+	$(proc)_loader_load(loader, platform);
+
+	/* initialize system information */
+	platform->entry = $(proc)_loader_start(loader);
+	$(proc)_set_brk(platform, $(proc)_brk_init(loader));
+
+	/* !!TODO!! add argc,argv... init */
+	/* stack initialization */
+	$(proc)_stack_fill_env(loader, platform, platform->sys_env);
+}
+
+
+/**
+ * Load the given program in the platform and initialize stack
+ * @param platform	Platform to load in.
+ * @param path		Path of the file to load.
+ * @return			0 for success, -1 for error (in errno).
+ */
+int $(proc)_load_platform($(proc)_platform_t *platform, const char *path) {
+	struct $(proc)_loader_t *loader;
+	assert(platform);
+
+	/* open the file */
+	loader = $(proc)_loader_open(path);
+	if(loader == NULL)
+		return -1;
+
+	/* load in platform's memory */
+	$(proc)_load(platform, loader);
+
+	/* close the file */
+	$(proc)_loader_close(loader);
+
+	/* return success */
+	return 0;
+}
+#endif	/* $(PROC)_LOADER_STATE */

@@ -207,6 +207,10 @@ $(if is_CISC_present)
 uint32_t value_on_mask(mask_t *inst, mask_t *mask);
 $(end)
 
+/* assertion management */
+void $(proc)_assert($(proc)_state_t *state, int c, const char *file, int line);
+extern int $(proc)_assert_enable;
+
 __END_DECLS
 
 #endif /* GLISS_$(PROC)_INCLUDE_$(PROC)_API_H */

@@ -323,6 +323,20 @@ and scan_end buf cnt = parse
 
 
 {
+
+(** Perform a template generation from a string template.
+	@param dict		Dictionnary to use.
+	@param str		String template.
+	@param out_path	Path of the output file. *)
+let generate_from_string dict str out_path =
+	let output = open_out out_path in
+	file := "<>";
+	line := 1;	
+	scanner output dict TOP (Lexing.from_string str);
+	close_out output;
+	file := "";
+	line := 0
+
 (** Perform a template generation.
 	@param dict		Dictionnary to use.
 	@param in_path	Input template path.

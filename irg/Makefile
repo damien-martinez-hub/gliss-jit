@@ -11,6 +11,7 @@ endif
 LIB_SOURCES = \
 	config.ml \
 	IdMaker.ml \
+	irgCommon.ml \
 	irg.ml \
 	irgio.ml \
 	instantiate.ml \

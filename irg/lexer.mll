@@ -36,25 +36,25 @@ let lexbuf = ref (Lexing.from_string "")
 let lexicon = Irg.StringHashtbl.create 211
 let keyword id =
 	try
-		let e=Irg.StringHashtbl.find lexicon id
-		in
+		let e=Irg.StringHashtbl.find lexicon id in
 		match e with
 		 EXCEPTION _->EXCEPTION !line
-		|LET _->LET !line
-		|MEM _->MEM !line
-		|MODE _->MODE !line
-		|OP _-> OP !line
-		|REG _->REG !line
-		|VAR _->VAR !line
-		|RESOURCE _->RESOURCE !line
-		|TYPE _->TYPE !line
-		|_->e
+		|LET _		-> LET !line
+		|MEM _		-> MEM !line
+		|MODE _		-> MODE !line
+		|OP _		-> OP !line
+		|REG _		-> REG !line
+		|VAR _		-> VAR !line
+		|RESOURCE _	-> RESOURCE !line
+		|TYPE _		-> TYPE !line
+		|_			-> e
 	with Not_found -> (ID id)
 
 let keywords = [
 	("__attr",		ATTR);
 	("action",      ACTION);
 	("alias",       ALIAS);
+	("assert",		ASSERT);
 	("ports",       PORTS);
 	("bool",        BOOL);
 	("canon",		CANON);
@@ -95,10 +95,6 @@ let keywords = [
 	("uses",        USES);
 	("volatile",    VOLATILE)
 ]
-
-(* Is the NOP keyword really required ?
-	("nop",        	NOP);
-*)
 
 
 let _ =

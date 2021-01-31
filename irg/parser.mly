@@ -216,6 +216,7 @@ let top_endif _ =
 /* keywords */
 %token    	ACTION
 %token    	ALIAS
+%token		ASSERT
 %token	  	ATTR
 %token    	BOOL
 %token		CANON
@@ -695,6 +696,8 @@ Statement:
 		{ handle_stat (fun _ -> Sem.test_canonical $1; Sem.build_canonical_stat $1 (List.rev $3)) }
 |	ERROR LPAREN STRING_CONST RPAREN
 		{ handle_stat (fun _ -> Irg.ERROR $3) }
+|	ASSERT Expr
+		{ handle_stat (fun _ -> Sem.make_assert $2 !Lexer.file !Lexer.line) }
 |	LET ID EQ Expr
 		{ handle_stat (fun _ -> Sem.make_local $2 $4) }
 |	LET ID COLON Type EQ Expr

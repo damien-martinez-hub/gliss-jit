@@ -28,7 +28,7 @@ $(end)
 all: lib$(proc).a
 
 lib$(proc).a: $$(OBJECTS)
-	$$(AR) rcsu $$@ $$^
+	$$(AR) rcs $$@ $$^
 	$$(RANLIB) $$@
 
 clean:

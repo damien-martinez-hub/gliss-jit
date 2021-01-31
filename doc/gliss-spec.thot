@@ -513,6 +513,19 @@ and mode but only to the ones that are common to all specifications
 If an identifier concernes an OR operation or mode, the attributes are
 applied to the list of specification of the OR definition.
 
+===== Assert Statement =====
+
+@(GLISS) in its last version support an assertion statement:
+
+<code>
+	Statement ::= ...
+	            | 'assert' Expression
+</code>
+
+This statement stops the execution of a simulation as soon as the passed condition  evaluates to false.
+
+This behaviour may be statically disabled statically, at generation time using ''-ndebug'' option of ''gep'', or at run time, by setting the environment variable ''NDEBUG'' to ''yes''.
+From performances point of view, only the generation time disabling allows to fully remove any execution time cost.
 
 
 
