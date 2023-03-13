@@ -2,7 +2,8 @@
 *.cmi
 *.cma
 *.cmax
-doc/
+doc/*.html
+doc/*-imports
 autodoc/
 */.dep
 

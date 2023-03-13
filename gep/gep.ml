@@ -112,6 +112,7 @@ let size                 				= ref 0
 let sources : string list ref			= ref []
 let switches: (string * bool) list ref	= ref []
 let no_default							= ref false
+let python								= ref false
 let options = [
 	("-m",   Arg.String  add_module, "add a module (module_name:actual_module)]");
 	("-s",   Arg.Set_int size, "for fixed-size ISA, size of the instructions in bits (to control NMP images)");
@@ -129,7 +130,8 @@ let options = [
 	("-fstat", Arg.Set Fetch.output_fetch_stat, "generates stats about fetch tables in <proc_name>_fetch_tables.stat");
 	("-c", Arg.Set check, "only check if the NML is valid for generation");
 	("-no-default", Arg.Set no_default, "disable automatic generation of Makefile, api, fetch, decode and code tables");
-	("-t", Arg.String add_template, "add a template to generate")
+	("-t", Arg.String add_template, "add a template to generate");
+	("-python", Arg.Set python, "generate code for interfacing with Python")
 ] @ Stot.opts
 
 
@@ -833,7 +835,7 @@ let _ =
 				List.iter (fun (inp, out) -> App.make_template_path inp out dict) !templates;
 
 				(* generate application *)
-				if !sim then
+				if !sim then begin
 					try
 						let path = App.find_lib "sim/sim.c" paths in
 						App.makedir "sim";
@@ -846,5 +848,13 @@ let _ =
 							"sim/Makefile"
 					with Not_found ->
 						raise (Sys_error "no template to make sim program")
+				end;
+				
+				(* generate python interfacing *)
+				if !python then begin
+					App.makedir "python";
+					App.make_template "setup.py" "python/setup.py" dict;
+					App.make_template "python.c" "python/python.c" dict					
+				end
 			end
 		)
