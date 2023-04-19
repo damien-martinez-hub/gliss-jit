@@ -1772,7 +1772,7 @@ let get_root _ =
 
 (* regex for format decoding *)
 let format_regex = Str.regexp (
-	  "%[0-9]*\\(h\\|l\\|hh\\|ll\\)?[dioxXub]\\|"	(* integer formats *)
+	  "%[+]?[0-9]*\\(h\\|l\\|hh\\|ll\\)?[dioxXub]\\|"	(* integer formats *)
 	^ "%[0-9]*\\(\\.[0-9]+\\)?L?[aAeEfFgG]\\|"		(* float formats *)
 	^ "%[0-9]*s\\|"									(* string format *)
 	^ "%[0-9]*b\\|"									(* binary format *)
