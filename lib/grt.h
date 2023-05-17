@@ -241,17 +241,13 @@ double gliss_cast_64tod(uint64_t d);
 
 
 /* signed/unsigned conversion */
-#define __GLISS_MASK32(n, e)		((n)==32 ? (e) : ((e) & ((1 << n) - 1)))
-#define __GLISS_MASK64(n, e)		((n)==64 ? (e) : ((e) & ((1LL << n) - 1)))
-#define __GLISS_CSIZE(t)			(sizeof((t)(1) + 1) * 8)
-#define __GLISS_EXTS(n, e)			(((e) << (n)) >> (n))
-#define __GLISS_EXTS8(n, e)			__GLISS_EXTS(__GLISS_CSIZE( int8_t) -  8 + (n), (e))
-#define __GLISS_EXTS16(n, e)		__GLISS_EXTS(__GLISS_CSIZE(int16_t) - 16 + (n), (e))
-#define __GLISS_EXTS32(n, e)		__GLISS_EXTS(__GLISS_CSIZE(int32_t) - 32 + (n), (e))
-#define __GLISS_EXTS64(n, e)		__GLISS_EXTS(__GLISS_CSIZE(int64_t) - 64 + (n), (e))
-//#define __GLISS_EXTS8(n, e)			(((-1L ) << ( 8 - (n)))|(e))
-//#define __GLISS_EXTS16(n, e)		(((-1L ) << (16 - (n)))|(e))
-//#define __GLISS_EXTS32(n, e)		(((-1L ) << (32 - (n)))|(e))
-//#define __GLISS_EXTS64(n, e)		(((-1LL) << (64 - (n)))|(e))
+#define __GLISS_MASK32(n, e)	((n)==32 ? (e) : ((e) & ((1 << n) - 1)))
+#define __GLISS_MASK64(n, e)	((n)==64 ? (e) : ((e) & ((1LL << n) - 1)))
+#define __GLISS_CSIZE(t)		(sizeof((t)(1) + 1) * 8)
+#define __GLISS_EXTS(n, e)		(((e) << (n)) >> (n))
+#define __GLISS_EXTS8(n, e)		__GLISS_EXTS(32-(n), (int32_t)(e))
+#define __GLISS_EXTS16(n, e)	__GLISS_EXTS(32-(n), (int32_t)(e))
+#define __GLISS_EXTS32(n, e)	__GLISS_EXTS(32-(n), (int32_t)(e))
+#define __GLISS_EXTS64(n, e)	__GLISS_EXTS(64-(n), (int64_t)(e))
 
 #endif /* GLISS_GRT_H */

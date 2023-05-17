@@ -1,8 +1,7 @@
-    (*
- * $Id: gep.ml,v 1.39 2009/11/26 09:01:16 casse Exp $
+(*
  * Copyright (c) 2008, IRIT - UPS <casse@irit.fr>
  *
- * This file is part of OGliss.
+ * This file is part of GLISS2.
  *
  * GLISS2 is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -249,32 +248,43 @@ let output_decoder_complex info inst idx sfx size is_risc out =
 		let num_frmt_params = List.length frmt_params in
 		let spec_params = Iter.get_params inst in
 		let spec_params_name = List.map fst spec_params in
-		let get_nth_expr n = snd (List.nth (snd !inst_decode_arg) n) in
 		let output_expr e =
 			let info = Toc.info () in
 			let o = info.Toc.out in
 			info.Toc.out <- out;
 			Toc.gen_expr info (snd (Toc.prepare_expr info Irg.NOP e)) false;
-			info.Toc.out <- o
-		in
-		(*let rec get_str e =
-			match e with
-			| Irg.FORMAT(str, _) -> str
-			| Irg.CONST(Irg.STRING, Irg.STRING_CONST(str)) -> str
-			| Irg.ELINE(_, _, e) -> get_str e
-			| _ -> ""
-		in*)
+			info.Toc.out <- o in
+
 		(* decode every format param once in one pass for each instr *)
-		if (fst !inst_decode_arg) <> inst then
-			(let rec aux n =
+		if (fst !inst_decode_arg) <> inst then begin
+			let rec aux n =
 				if n < num_frmt_params then
 					(Irg.CONST (Irg.NO_TYPE, Irg.CANON (Decode.get_decode_for_format_param inst n)))::(aux (n + 1))
 				else
 					[]
 			in
 			let expr_frmt_params = aux 0 in
-			inst_decode_arg := (inst, Decode_arg.decode_fast spec_params_name frmt_params expr_frmt_params inst));
-		output_expr (get_nth_expr idx);
+			inst_decode_arg := (inst, Decode_arg.decode_fast spec_params_name frmt_params expr_frmt_params inst)
+		end;
+
+		(* Generate the code. *)
+		let cst x = Irg.CONST(Irg.INT(32), CARD_CONST (Int32.of_int x)) in
+		let canon t id args = Irg.CANON_EXPR (t, id, args) in
+		let cst_t t = Irg.CONST (Irg.NO_TYPE, Irg.CANON (Toc.type_to_string t)) in
+		let fix_sign st e =
+			let t = Sem.get_expr_from_type st in
+			match t with
+			| INT(t_size) ->
+				let ct = Toc.convert_type t in
+				let c_size = Toc.ctype_size ct in
+				if t_size = c_size then e else
+				canon t (sprintf "__%s_EXTS%d" (String.uppercase_ascii info.Toc.proc) c_size) [cst t_size; e]
+			| _ -> e in	
+
+		output_expr
+			(fix_sign
+				(snd (List.nth spec_params idx))
+				(snd (List.nth (snd !inst_decode_arg) idx)));
 		output_char out '\n'
 
 

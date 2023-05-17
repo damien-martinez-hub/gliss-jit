@@ -55,6 +55,7 @@ $(else)
 #define __EXTRACT_CISC(mask, inst)	extract_mask(inst, mask)
 #define __EXTS_CISC(mask, inst, n)	(((int64_t)__EXTRACT_CISC(mask, inst) << (64 - (n))) >> (64 - (n)))
 $(end)$(end)$(end)
+#define __EXT_SIGN(t, x, s)	((((t)(x)) << (s))>>(s)
 
 
 static$(if !GLISS_NO_MALLOC) $(proc)_inst_t *$(else) void $(end)$(proc)_instr_UNKNOWN_decode($(code_read_param_decl)code_inst$(if GLISS_NO_MALLOC), $(proc)_inst_t *inst$(end))
