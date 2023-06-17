@@ -249,6 +249,8 @@ let output_decoder_complex info inst idx sfx size is_risc out =
 		let spec_params = Iter.get_params inst in
 		let spec_params_name = List.map fst spec_params in
 		let output_expr e =
+			Irg.dump_type := true;
+			printf "DEBUG: %a\n" Irg.output_expr e;
 			let info = Toc.info () in
 			let o = info.Toc.out in
 			info.Toc.out <- out;
@@ -258,19 +260,21 @@ let output_decoder_complex info inst idx sfx size is_risc out =
 		(* decode every format param once in one pass for each instr *)
 		if (fst !inst_decode_arg) <> inst then begin
 			let rec aux n =
-				if n < num_frmt_params then
-					(Irg.CONST (Irg.NO_TYPE, Irg.CANON (Decode.get_decode_for_format_param inst n)))::(aux (n + 1))
-				else
-					[]
-			in
+				if n >= num_frmt_params then [] else
+				let c = Decode.get_decode_for_format_param inst n in
+				(Decode_arg.csta (Irg.CANON c))::(aux (n + 1)) in
 			let expr_frmt_params = aux 0 in
-			inst_decode_arg := (inst, Decode_arg.decode_fast spec_params_name frmt_params expr_frmt_params inst)
+			inst_decode_arg := (inst,
+				Decode_arg.decode_fast
+					spec_params_name
+					frmt_params
+					expr_frmt_params
+					inst)
 		end;
 
 		(* Generate the code. *)
 		let cst x = Irg.CONST(Irg.INT(32), CARD_CONST (Int32.of_int x)) in
 		let canon t id args = Irg.CANON_EXPR (t, id, args) in
-		let cst_t t = Irg.CONST (Irg.NO_TYPE, Irg.CANON (Toc.type_to_string t)) in
 		let fix_sign st e =
 			let t = Sem.get_expr_from_type st in
 			match t with

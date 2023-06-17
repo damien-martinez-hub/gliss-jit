@@ -194,6 +194,9 @@ let get_instr_info inst =
 	}
 
 
+(** Get the C decoding expression for argument in image format.
+	@param inst		Current instruction.
+	@param idx		Index of the image format argument. *)
 let get_decode_for_format_param inst idx =
 	let inst_info = get_instr_info inst in
 	let find_first_bit mask =
@@ -220,6 +223,7 @@ let get_decode_for_format_param inst idx =
 	in
 	let frmt_params = get_frmt_params image_attr in
 	let nth_frmt_param i = List.nth frmt_params i in
+
 	let decoder inst idx sfx size =
 		let string_mask = get_mask_for_format_param (get_format_string inst) idx in
 		let cst_suffix = Bitmask.c_const_suffix string_mask in
@@ -233,6 +237,7 @@ let get_decode_for_format_param inst idx =
 		match Sem.get_type_expr (nth_frmt_param idx) with
 		| Irg.INT n when n <> 8 && n <> 16 && n <> 32 -> exts n
 		| _ -> extract () in
+
 	let decoder_CISC inst idx sfx =
 		let suffix = if sfx then "_CISC" else "" in
 		let suffix_code = if sfx then "->mask" else "" in

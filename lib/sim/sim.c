@@ -801,7 +801,8 @@ int main(int argc, char **argv) {
 				inst_cnt += gliss_run_and_count_inst(sim);
 			else
 			{
-				while(addr_exit != state->GLISS_PC_NAME)
+				while(addr_exit != state->GLISS_PC_NAME
+				&& !gliss_is_sim_ended(sim))
 				{
 					gliss_step(sim);
 					inst_cnt++;
@@ -842,8 +843,10 @@ int main(int argc, char **argv) {
 				gliss_output_state_valid(state, vout);
             gliss_free_inst(inst);
             gliss_step(sim);
-            if(dump)
-		gliss_dump_state(state, stderr);
+            if(dump) {
+				gliss_dump_state(state, stderr);
+				fputc('\n', stderr);
+			}
 			inst_cnt++;
 		}
 		
