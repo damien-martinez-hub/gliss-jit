@@ -1084,3 +1084,26 @@ void gliss_unset_range_callback(gliss_memory_t *mem, gliss_address_t start, glis
 		a = a + MEMORY_PAGE_SIZE;
 	}		
 }
+
+/**
+ * Get the callback data corresponding to the given address.
+ * @param mem	Memory to work with.
+ * @param a		Examined address.
+ * @return		Callback if any, NULL else.
+ */
+void *gliss_get_callback_data(gliss_memory_t *mem, gliss_address_t a) {
+
+	/* synchronize callback information */
+	if (mem->callback_infos.is_changed)
+		update_callback_infos(mem);
+
+	/* get the page */
+	memory_64_t *m = (memory_64_t *)mem;
+	memory_page_table_entry_t *pte = mem_get_page(m, a);
+
+	/* get callback data */
+	if(pte->info == NULL)
+		return NULL;
+	else
+		return pte->info->callback_data;
+}

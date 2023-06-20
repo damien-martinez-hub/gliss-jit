@@ -80,6 +80,7 @@ void gliss_mem_write(gliss_memory_t *memory, gliss_address_t, void *buf, size_t 
 typedef void (*gliss_callback_fun_t)(gliss_address_t addr, int size, void *data, int type_access, void *cdata);
 void gliss_set_range_callback(gliss_memory_t *mem, gliss_address_t start, gliss_address_t end, gliss_callback_fun_t f, void* data);
 void gliss_unset_range_callback(gliss_memory_t *mem, gliss_address_t start, gliss_address_t end);
+void *gliss_get_callback_data(gliss_memory_t *mem, gliss_address_t a);
 
 /* spy function prototypes */
 #ifdef GLISS_MEM_SPY
