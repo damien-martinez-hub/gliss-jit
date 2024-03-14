@@ -243,22 +243,32 @@ let scan_decode_arguments args vals =
 	@param inst		Currently processed instruction.
 	@return			Decoding pairs. *)
 let decode_parameters params args vals inst =
-	let t =
+
+	let dec_exprs =
 		try scan_decode_arguments args vals
 		with Toc.PreError f -> raise (Toc.OpError (inst, f)) in
+
 	let rec process (p, m, e) (p', m', e') =
 		if p <> p' then
 			(p, m, e)
 		else
 		begin
-			if Bitmask.is_null (and_mask m m')
-			then
+			if not (Bitmask.is_null (and_mask m m')) then
+				raise (Toc.Error (Printf.sprintf
+					"some parameter %s bits are redundant in image for instruction %s"
+					p (Iter.get_user_id inst)))
+			else if e = Irg.NONE then
+				(p, m', e')
+			else
 				(p, or_mask m m', or_ e e')
-			else raise (Toc.Error (Printf.sprintf "some parameter %s bits are redundant in image for instruction %s" p (Iter.get_user_id inst)))
 		end in
+
 	List.map
 		(fun p ->
-			let (p, m, e) = List.fold_left process (p, Bitmask.void_mask, cst Int32.zero) t in
+			let (p, m, e) = List.fold_left
+				process
+				(p, Bitmask.void_mask, Irg.NONE)
+				dec_exprs in
 			(*Printf.printf "map pme = %s: %s\n" p (Bitmask.to_string m);*)
 			let lm = Bitmask.bit_count m in
 			let lm' = Sem.get_type_length (Sem.get_type_ident p) in

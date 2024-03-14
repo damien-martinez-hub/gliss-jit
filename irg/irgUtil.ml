@@ -41,10 +41,10 @@ let run_nmp2nml file =
 	(* run it *)
 	let cmd =
 		if is_windows then
-			let cmd = "perl " ^ (native_path cmd) in
-			Printf.sprintf "%s %s" cmd file
+			let cmd = sprintf "perl '%s' " (native_path cmd) in
+			Printf.sprintf "%s '%s'" cmd file
 		else
-			Printf.sprintf "%s %s" cmd file in
+			Printf.sprintf "'%s' '%s'" cmd file in
 	Unix.open_process_in cmd
 
 

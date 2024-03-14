@@ -64,6 +64,7 @@ the generation templates
   * ''-on'' //SWITCH// -- activate the given switch
   * ''-fstat'' -- generates stats about fetch tables in the file <proc_name>_fetch_tables.stat
   * ''-O'' -- activates instruction tree various optimizations as implemented in optirg
+  * ''-python'' -- generates Python interface for GLISS.
 
 
 ===== gliss-nmp2nml.pl =====

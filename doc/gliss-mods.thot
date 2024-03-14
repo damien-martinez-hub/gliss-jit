@@ -622,3 +622,185 @@ void gliss_set_register(gliss_state_t *state, int id, int index, register_value_
 Change the value of register in the given state. It is identifier by the ''id'', possibly indexed,
 and the value is used to change the register.
 
+
+===== ''grt'' interface =====
+
+This interface is always provided and contains GLISS Run-Time functions
+implemented facilities not already contained in the C standard library.
+
+==== Functions ====
+
+<code>
+#define gliss_mask32(n)
+#define gliss_mask64(n)
+</code>
+Build a mask of //n// bits (//n// 1's).
+
+<code>
+uint32_t gliss_rotate_left32(int l, uint32_t v, int r);
+uint32_t gliss_rotate_left8(int l, uint32_t v, int r);
+uint32_t gliss_rotate_left16(int l, uint32_t v, int r);
+uint64_t gliss_rotate_left64(int l, uint64_t v, int r);
+</code>
+Implements left-rotation of a value of size //l// bits of value //v// of //r// bits.
+
+<code>
+uint32_t gliss_rotate_right32(int l, uint32_t v, int r);
+uint32_t gliss_rotate_right8(int l, uint32_t v, int r);
+uint32_t gliss_rotate_right16(int l, uint32_t v, int r);
+uint64_t gliss_rotate_right64(int l, uint64_t v, int r);
+</code>
+Implements left-rotation of a value expressed on //l// bits of value //v// of //r// bits.
+
+<code>
+#define gliss_concat32(v1, v2, n1, n2)
+#define gliss_concat8(v1, v2, n1, n2)
+#define gliss_concat16(v1, v2, n1, n2)
+#define gliss_concat64(v1, v2, n1, n2)
+</code>
+Perform a bit concatenation of values //v1//:://v2// with //v1// made of //n1// bits and //v2// of //n2// bits.
+
+<code>
+#define gliss_exp8(v1, v2)
+#define gliss_exp8u(v1, v2)
+#define gliss_exp16(v1, v2)
+#define gliss_exp16u(v1, v2)
+int32_t gliss_exp32(int32_t v1, int32_t v2);
+uint32_t gliss_exp32u(uint32_t v1, uint32_t v2);
+int64_t gliss_exp64(int64_t v1, int64_t v2);
+uint64_t gliss_exp64u(uint64_t v1, uint64_t v2);
+</code>
+Implements //v1// power //v2//.
+
+<code>
+#define gliss_set_field8(  v, s, u, l)
+#define gliss_set_field8u( v, s, u, l)
+#define gliss_set_field16( v, s, u, l)
+#define gliss_set_field16u(v, s, u, l)
+#define gliss_set_field32( v, s, u, l)
+float gliss_set_fieldf(float v, uint32_t s, int32_t u, int32_t l);
+#define gliss_set_field64(v, s, u, l)
+uint64_t gliss_set_field64u(uint64_t v, uint64_t s, int32_t u, int32_t l);
+double gliss_set_fieldd(double v, uint64_t s, int32_t u, int32_t l);
+</code>
+Compute the value //v// where bits from //u// to //l// are replaced by value //s// (assuming //u// >= //l//)
+
+<code>
+#define gliss_set_field8_inverted(v, s, u, l)
+#define gliss_set_field8u_inverted(v, s, u, l)
+#define gliss_set_field16_inverted(v, s, u, l)
+#define gliss_set_field16u_inverted(v, s, u, l)
+#define gliss_set_field32_inverted(v, s, u, l)
+uint32_t gliss_set_field32u_inverted(uint32_t v, uint32_t s, int32_t u, int32_t l);
+#define gliss_set_field64_inverted(v, s, u, l)
+uint64_t gliss_set_field64u_inverted(uint64_t v, uint64_t s, int32_t u, int32_t l);
+float gliss_set_fieldf_inverted(float v, uint32_t s, int32_t u, int32_t l);
+double gliss_set_fieldd_inverted(double v, uint64_t s, int32_t u, int32_t l);
+</code>
+Compute the value //v// where bits from //u// to //l// are replaced by value //s// which bits are inverted (assuming //u// >= //l//)
+
+<code>
+#define gliss_set_field8_generic(v, s, a, b, bo)
+#define gliss_set_field8u_generic(v, s, a, b, bo)
+#define gliss_set_field16_generic(v, s, a, b, bo)
+#define gliss_set_field16u_generic(v, s, a, b, bo)
+#define gliss_set_field32_generic(v, s, a, b, bo)
+uint32_t gliss_set_field32u_generic(uint32_t v, uint32_t s, int32_t a, int32_t b, int bit_order);
+#define gliss_set_field64_generic(v, s, a, b, bo)
+uint64_t gliss_set_field64u_generic(uint64_t v, uint64_t s, int32_t a, int32_t b, int bit_order);
+float gliss_set_fieldf_generic(float v, uint32_t s, int32_t a, int32_t b, int bit_order);
+double gliss_set_fieldd_generic(double v, uint64_t s, int32_t a, int32_t b, int bit_order);
+</code>
+Compute the value //v// where bits from //u// to //l// are replaced by value //s// (no assumption on order of //u// and //l//, performs bit inversion if //u// < //l//).
+
+<code>
+#define gliss_field32u(v, u, l)
+#define gliss_field64u(v, u, l)
+#define gliss_field8(v, u, l)
+#define gliss_field8u(v, u, l)
+#define gliss_field16(v, u, l)
+#define gliss_field16u(v, u, l)
+#define gliss_field32(v, u, l)
+#define gliss_fieldf(v, u, l)
+#define gliss_field64(v, u, l)
+#define gliss_fieldd(v, u, l)
+</code>
+Extract bits in range //u// to //l// from //v// (assuming //u// >= //l//).
+
+<code>
+#define gliss_field8_inverted(  v, u, l)
+#define gliss_field8u_inverted( v, u, l)
+#define gliss_field16_inverted( v, u, l)
+#define gliss_field16u_inverted(v, u, l)
+#define gliss_field32_inverted( v, u, l)
+uint32_t gliss_field32u_inverted(uint32_t v, uint32_t u, uint32_t l);
+#define gliss_field64_inverted(v, u, l)
+uint64_t gliss_field64u_inverted(uint64_t v, uint32_t u, uint32_t l);
+uint32_t gliss_fieldf_inverted(float v, uint32_t u, uint32_t l);
+uint64_t gliss_fieldd_inverted(double v, uint32_t u, uint32_t l);
+</code>
+Extract and invert bits in range //u// to //l// from //v// (assuming //u// >= //l//).
+
+<code>
+#define gliss_field8_generic(v, a, b, bo)
+#define gliss_field8u_generic(v, a, b, bo)
+#define gliss_field16_generic(v, a, b, bo)
+#define gliss_field16u_generic(v, a, b, bo)
+#define gliss_field32_generic(v, a, b, bo)
+uint32_t gliss_field32u_generic(uint32_t v, uint32_t a, uint32_t b, int bit_order);
+#define gliss_field64_generic(v, a, b, bo)
+uint64_t gliss_field64u_generic(uint64_t v, uint32_t a, uint32_t b, int bit_order);
+uint32_t gliss_fieldf_generic(float v, uint32_t a, uint32_t b, int bit_order);
+uint64_t gliss_fieldd_generic(double v, uint32_t a, uint32_t b, int bit_order);
+</code>
+Extract bits in range //u// to //l// from //v// (if //u// < //l//, the bits are inverted).
+
+<code>
+int gliss_enumerate(int val, int max);
+</code>
+Test if //val// is in range [0, //max//]. If not, raise an error.
+
+<code>
+#define gliss_coerce_ftoi(f)
+#define gliss_coerce_ftou(f)
+#define gliss_coerce_dtoi(d)
+#define gliss_coerce_dtou(d)
+#define gliss_coerce_itof(i)
+#define gliss_coerce_utof(u)
+#define gliss_coerce_itod(i)
+#define gliss_coerce_utod(u)
+</code>
+Perform value conversion between float (''f''), double (''d''), signed integer (''i'') and unsigned integer (''u'').
+
+<code>
+#define gliss_cast_fto8(f)
+#define gliss_cast_fto16(f)
+uint32_t gliss_cast_fto32(float f);
+#define gliss_cast_fto64(f)
+#define gliss_cast_dto8(f)
+#define gliss_cast_dto16(f)
+#define gliss_cast_dto32(f)
+uint64_t gliss_cast_dto64(double f);
+
+#define gliss_cast_8tof(i)
+#define gliss_cast_16tof(i)
+float gliss_cast_32tof(uint32_t i);
+#define gliss_cast_64tof(i)
+
+#define gliss_cast_8tod(i)
+#define gliss_cast_16tod(i)
+#define gliss_cast_32tod(i)
+double gliss_cast_64tod(uint64_t d);
+</code>
+Perform bt-to-bit conversion with 8, 16, 32 or 64 unsigned integer and float (''f'') and double (''d'').
+
+<code>
+#define __GLISS_EXTS8(n, e)
+#define __GLISS_EXTS16(n, e)
+#define __GLISS_EXTS32(n, e)
+#define __GLISS_EXTS64(n, e)
+</code>
+Perform sign extension for types that do not match a C type size. Value //e// on //n// bits is extended to get the right sign on the corresponding C type.
+
+
+

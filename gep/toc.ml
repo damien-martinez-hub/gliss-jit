@@ -1130,10 +1130,11 @@ and mask info t f =
 	@param t	Result type.
 	@param f	Function displaying the expression. *)
 and exts info t f =
+	let c_size = ctype_size (convert_type t) in
+	let t_size = type_size t in
 	match t with
-	| Irg.INT _ when (ctype_size (convert_type t)) <> (type_size t) ->
-		let shift = (ctype_size (convert_type t)) - (type_size t) in
-		Printf.fprintf info.out "__%s_EXTS(%d, " (Config.uppercase info.proc) shift;
+	| Irg.INT _ when c_size <> t_size ->
+		Printf.fprintf info.out "__%s_EXTS%d(%d, " (Config.uppercase info.proc) c_size t_size;
 		f ();
 		Printf.fprintf info.out ")"
 	| _ ->
@@ -1300,10 +1301,6 @@ and gen_coerce info t1 expr parent prfx =
 		Printf.fprintf info.out "%s_check_enum(" info.proc;
 		f ();
 		Printf.fprintf info.out ", %d)" (List.length vals) in
-	let exts n f a =
-		Printf.fprintf info.out "__%s_EXTS%d(%d, " (Config.uppercase info.proc) (ctype_size t1c) n;
-		f a;
-		Printf.fprintf info.out ")" in
 	let word_size (x: int) =
 		List.mem x [8; 16; 32; 64; 128] in
 
@@ -1318,17 +1315,24 @@ and gen_coerce info t1 expr parent prfx =
 	| Irg.BOOL, Irg.FLOAT _ -> eq0 asis ()
 
 	(* conversion to card *)
-	| Irg.CARD n, Irg.CARD m when n < m 					-> mask m n asis ()
-	| Irg.CARD n, Irg.CARD m when n > m 					-> cast asis ()
-	| Irg.CARD n, Irg.INT  m when n = m 					-> cast asis ()
-	| Irg.CARD n, Irg.INT  m when n < m 					-> cast (mask m n asis) ()
-	| Irg.CARD n, Irg.INT  m when n > m && (word_size m)	-> cast asis ()
-	| Irg.CARD n, Irg.INT  m when n > m						-> cast (mask m m asis) ()
-	| Irg.CARD _, Irg.BOOL									-> cast asis ()
+	| Irg.CARD n, Irg.CARD m when n < m ->
+		mask m n asis ()
+	| Irg.CARD n, Irg.CARD m when n > m ->
+		cast asis ()
+	| Irg.CARD n, Irg.INT  m when n = m ->
+		cast asis ()
+	| Irg.CARD n, Irg.INT  m when n < m ->
+		cast (mask m n asis) ()
+	| Irg.CARD n, Irg.INT  m when n > m && (word_size m) ->
+		cast asis ()
+	| Irg.CARD n, Irg.INT  m when n > m	->
+		cast (mask m m asis) ()
+	| Irg.CARD _, Irg.BOOL
 	| Irg.CARD _, Irg.RANGE _
-	| Irg.CARD _, Irg.ENUM _ 								-> cast asis ()
-	| Irg.CARD _, Irg.FLOAT (23, 9) 						-> cast asis ()
-	| Irg.CARD _, Irg.FLOAT (52, 12) 						-> cast asis ()
+	| Irg.CARD _, Irg.ENUM _
+	| Irg.CARD _, Irg.FLOAT (23, 9)
+	| Irg.CARD _, Irg.FLOAT (52, 12) ->
+		cast asis ()
 
 	(* conversion to int *)
 	| Irg.INT n, Irg.INT _
@@ -1340,8 +1344,8 @@ and gen_coerce info t1 expr parent prfx =
 		let cn = ctype_size t1c in
 		let cm = ctype_size t2c in
 		if n = cn && m = cm then cast asis ()
-		else if n >= m then exts (cn - m) (cast asis) ()
-		else exts (cm - n) (cast asis) ()
+		else if n >= m then exts info t1 (cast asis)
+		else exts info t1 (cast asis)
 
 	(* conversion to float *)
 	| Irg.FLOAT (23, 9), _

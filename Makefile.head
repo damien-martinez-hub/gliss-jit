@@ -55,7 +55,7 @@ OCAML_LIB =
 
 export OCAML_SITE = $(LIB_DIR)/ocaml/site-lib/
 
-.PRECIOUS: %.mli
+.PRECIOUS: %.mli %.cmi %.cmx %.cma %.cmxa
 
 
 # find the EXE extension

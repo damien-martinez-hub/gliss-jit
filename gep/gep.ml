@@ -1,8 +1,7 @@
-    (*
- * $Id: gep.ml,v 1.39 2009/11/26 09:01:16 casse Exp $
+(*
  * Copyright (c) 2008, IRIT - UPS <casse@irit.fr>
  *
- * This file is part of OGliss.
+ * This file is part of GLISS2.
  *
  * GLISS2 is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -121,6 +120,7 @@ let switches: (string * bool) list ref	= ref []
 let no_default							= ref false
 let ndebug								= ref false
 let config_tpl							= ref ""
+let python								= ref false
 let options = [
 	("-m",   Arg.String  add_module, "add a module (module_name:actual_module)]");
 	("-s",   Arg.Set_int size, "for fixed-size ISA, size of the instructions in bits (to control NMP images)");
@@ -140,7 +140,8 @@ let options = [
 	("-no-default", Arg.Set no_default, "disable automatic generation of Makefile, api, fetch, decode and code tables");
 	("-t", Arg.String add_template, "add a template to generate");
 	("-ndebug", Arg.Set ndebug, "disable debugging features (assertion)");
-	("-config", Arg.Set_string config_tpl, "use the given template to generate config.h")
+	("-config", Arg.Set_string config_tpl, "use the given template to generate config.h");
+	("-python", Arg.Set python, "generate code for interfacing with Python")
 ] @ Stot.opts
 
 
@@ -258,32 +259,47 @@ let output_decoder_complex info inst idx sfx size is_risc out =
 		let num_frmt_params = List.length frmt_params in
 		let spec_params = Iter.get_params inst in
 		let spec_params_name = List.map fst spec_params in
-		let get_nth_expr n = snd (List.nth (snd !inst_decode_arg) n) in
 		let output_expr e =
+			Irg.dump_type := true;
+			printf "DEBUG: %a\n" Irg.output_expr e;
 			let info = Toc.info () in
 			let o = info.Toc.out in
 			info.Toc.out <- out;
 			Toc.gen_expr info (snd (Toc.prepare_expr info Irg.NOP e)) false;
-			info.Toc.out <- o
-		in
-		(*let rec get_str e =
-			match e with
-			| Irg.FORMAT(str, _) -> str
-			| Irg.CONST(Irg.STRING, Irg.STRING_CONST(str)) -> str
-			| Irg.ELINE(_, _, e) -> get_str e
-			| _ -> ""
-		in*)
+			info.Toc.out <- o in
+
 		(* decode every format param once in one pass for each instr *)
-		if (fst !inst_decode_arg) <> inst then
-			(let rec aux n =
-				if n < num_frmt_params then
-					(Irg.CONST (Irg.NO_TYPE, Irg.CANON (Decode.get_decode_for_format_param inst n)))::(aux (n + 1))
-				else
-					[]
-			in
+		if (fst !inst_decode_arg) <> inst then begin
+			let rec aux n =
+				if n >= num_frmt_params then [] else
+				let c = Decode.get_decode_for_format_param inst n in
+				(Decode_arg.csta (Irg.CANON c))::(aux (n + 1)) in
 			let expr_frmt_params = aux 0 in
-			inst_decode_arg := (inst, Decode_arg.decode_fast spec_params_name frmt_params expr_frmt_params inst));
-		output_expr (get_nth_expr idx);
+			inst_decode_arg := (inst,
+				Decode_arg.decode_fast
+					spec_params_name
+					frmt_params
+					expr_frmt_params
+					inst)
+		end;
+
+		(* Generate the code. *)
+		let cst x = Irg.CONST(Irg.INT(32), CARD_CONST (Int32.of_int x)) in
+		let canon t id args = Irg.CANON_EXPR (t, id, args) in
+		let fix_sign st e =
+			let t = Sem.get_expr_from_type st in
+			match t with
+			| INT(t_size) ->
+				let ct = Toc.convert_type t in
+				let c_size = Toc.ctype_size ct in
+				if t_size = c_size then e else
+				canon t (sprintf "__%s_EXTS%d" (String.uppercase_ascii info.Toc.proc) c_size) [cst t_size; e]
+			| _ -> e in	
+
+		output_expr
+			(fix_sign
+				(snd (List.nth spec_params idx))
+				(snd (List.nth (snd !inst_decode_arg) idx)));
 		output_char out '\n'
 
 
@@ -867,7 +883,7 @@ let _ =
 					else Templater.generate_path dict tpl config_path;
  
 				(* generate application *)
-				if !sim then
+				if !sim then begin
 					try
 						let path = App.find_lib "sim/sim.c" paths in
 						App.makedir "sim";
@@ -880,5 +896,13 @@ let _ =
 							"sim/Makefile"
 					with Not_found ->
 						raise (Sys_error "no template to make sim program")
+				end;
+				
+				(* generate python interfacing *)
+				if !python then begin
+					App.makedir "python";
+					App.make_template "setup.py" "python/setup.py" dict;
+					App.make_template "python.c" "python/python.c" dict					
+				end
 			end
 		)

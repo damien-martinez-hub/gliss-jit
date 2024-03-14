@@ -115,17 +115,28 @@ the factorization power of such a structure to perform the PC
 incrementation that is common to all instructions.
 
 <code>
+<<<<<<< HEAD
 op allinstr = set | add | beq
+=======
+op allinstr = set | add | ifeq
+>>>>>>> 7e650ffadcc42b6caf660ad8a535eaf66fbcb0f3
 </code>
 
 This OR operation gives alternatives for building an instruction,
 the three supported instruction that are defined as AND operations.
 
 <code>
+<<<<<<< HEAD
 op set(d: reg_mode, imm: int(8))
 	syntax = format("set %s, #%d", d, imm)
 	image = format("0000 %s %8b", d, imm)
 	action = { d = imm; }
+=======
+op set(r: reg_mode, imm: int(8))
+	syntax = format("set %s, #%d", r, imm)
+	image = format("0000 %s %8b", r, imm)
+	action = { r = imm; }
+>>>>>>> 7e650ffadcc42b6caf660ad8a535eaf66fbcb0f3
 </code>
 
 This AND operations define the actual operation ''add''. ''syntax''

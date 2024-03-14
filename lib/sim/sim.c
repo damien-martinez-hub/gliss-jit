@@ -60,6 +60,7 @@ static void handle_alarm(int signum) {
 void usage(const char *prog_name) {
 	fprintf(stderr, "SYNTAX: %s OPTIONS <exec_name> <exec arguments>\n\n"
 			"OPTIONS may be a combination of \n"
+			"  -dump                 : simply dump state after each instruction.\n"
 			"  -exit=<hexa_address>] : simulation exit address (default symbol _exit)\n"
 			"  -f, -fast             : Step by step simulation is disable and straightforward execution is prefered (through run_sim())\n"
 			"  -h, -help             : display usage message\n"
@@ -550,6 +551,7 @@ int main(int argc, char **argv) {
 	uint64_t start_sys_time=0, end_sys_time, sys_delay = 0;
 	struct timeval start_all_time;
 	int time = 0;
+	int dump = 0;
 
 	/* scan arguments */
 	for(i = 1; i < argc; i++) {
@@ -630,6 +632,10 @@ int main(int argc, char **argv) {
 			valid = 1;
 			valid_path = argv[i] + 7;
 		}
+
+		/* -dump option */
+		else if(strcmp(argv[i], "-dump") == 0)
+			dump = 1;
 
 		/* option ? */
 		else if(argv[i][0] == '-') {
@@ -795,7 +801,8 @@ int main(int argc, char **argv) {
 				inst_cnt += gliss_run_and_count_inst(sim);
 			else
 			{
-				while(addr_exit != state->GLISS_PC_NAME)
+				while(addr_exit != state->GLISS_PC_NAME
+				&& !gliss_is_sim_ended(sim))
 				{
 					gliss_step(sim);
 					inst_cnt++;
@@ -836,6 +843,10 @@ int main(int argc, char **argv) {
 				gliss_output_state_valid(state, vout);
             gliss_free_inst(inst);
             gliss_step(sim);
+            if(dump) {
+				gliss_dump_state(state, stderr);
+				fputc('\n', stderr);
+			}
 			inst_cnt++;
 		}
 		

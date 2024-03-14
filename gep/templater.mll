@@ -98,18 +98,17 @@ and do_text_fallback out dict id =
 	@param id	Text identifier.
 	@param f	Fall-back function. *)
 and do_text_complete out dict id f =
+
 	let p =  try String.index id ':' with Not_found -> -1 in
 	let id = if p == -1 then id else String.sub id 0 p in
 	let args = if p == -1 then "" else (String.sub id (p + 1) ((String.length id) - p - 1)) in
-		
-	try
-		(match List.assoc id dict with
-		| TEXT f -> f out
-		| FUN f ->  f out args
-		| GEN_TEXT f -> f out id
-		| _ -> f out dict id)
-	with Not_found ->
-		f out dict id
+
+	match List.assoc_opt id dict with
+	| None 				-> f out dict id
+	| Some (TEXT f)		-> f out
+	| Some (FUN f)		->  f out args
+	| Some (GEN_TEXT f)	-> f out id
+	| _					-> f out dict id
 
 
 (** Get a collection.
@@ -257,7 +256,7 @@ rule scanner out dict state = parse
 	}
 
 | "$(" ([^ ')']+ as id) ")"
-	{ do_text out dict id; scanner out dict state lexbuf }
+	{	do_text out dict id; scanner out dict state lexbuf }
 
 | "//$"
 	{ comment out dict state lexbuf }

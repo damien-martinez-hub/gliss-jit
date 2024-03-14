@@ -11,6 +11,7 @@ extern  "C"
 
 #include <$(proc)/api.h>
 #include <$(proc)/macros.h>
+#include <$(proc)/grt.h>
 
 /* module headers */
 $(foreach modules)$(CODE_HEADER)$(end)
