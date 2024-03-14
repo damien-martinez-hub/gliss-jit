@@ -1084,6 +1084,7 @@ Statement ::=
 	| CallStatement
 	| LetStatement
 	| ForStatement
+	| AssertStatement
 </code>
 
 ===== Action Statement =====
@@ -1254,4 +1255,26 @@ ForStatement ::= 'for' i: ID 'in' lo: Expr '..' up: Expr ''do'' Sequence ''enddo
 Expressions //lo// and //up// are evaluated at compilation time and must
 be integer constants. The loop repeats the statement sequence for //i//
 ranging from //lo// to //up// incremented by a step of 1.
+
+
+===== Assert Statement =====
+
+**The ''assert'' statement is a GLISS extension to NML!**
+
+''assert'' statements allows to include assertion tests in the ''action'' of operations. As presentet below, it takes as parameter an expression that must evaluates to an integer. At run-time, the expression is evaluated and if the result is 0 the simulation is stopped with an assertion error. The purpose of this instruction is mainly for debugging and to check bad execution conditions.
+
+<code>
+AssertStatemment ::= 'assert' Expr ';'
+</code>
+
+Basically, the assertion are evaluated and tested at each execution. To disable them, you can use:
+
+  * ''-ndebug'' with ''gep'' commands (at generation time).
+  * by setting the generated variable //XXX//''_assert_enable'' to 0 (at run time).
+  * by setting the environment variable ''GLISS_NDEBUG'' to ''yes''.
+
+
+
+
+
 

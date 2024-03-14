@@ -1065,6 +1065,7 @@ void $(proc)_assert($(proc)_state_t *state, int cond, const char *file, int line
 	if($(proc)_assert_enable && !cond) {
 		$(proc)_dump_state(state, stderr);
 		fprintf(stderr, "Assertion failure at %s:%d\n", file, line);
+		abort();
 	}
 }
 

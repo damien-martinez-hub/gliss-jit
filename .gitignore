@@ -21,3 +21,6 @@ irg/parser.output
 irg/print_irg
 optirg/formatlexer.ml
 optirg/optirg
+
+test/assert/include
+test/assert/src

@@ -731,6 +731,7 @@ let find_mod m =
 		| path::tail ->
 			let path = Irg.native_path path in
 			let source_path = path ^ "/" ^ m.aname ^ ".c" in
+			printf "DEBUG: testing %s.\n" source_path;
 			if Sys.file_exists source_path then m.path <- path
 		else find_lib tail in
 
