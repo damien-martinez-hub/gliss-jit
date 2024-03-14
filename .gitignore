@@ -25,3 +25,7 @@ optirg/optirg
 
 test/assert/include
 test/assert/src
+
+toy/include/
+toy/sim/
+toy/src/
