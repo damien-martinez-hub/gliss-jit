@@ -818,7 +818,7 @@ Expr:
 		{
 		let id = Sem.unalias_local $1 in
 		if Irg.is_defined id then
-			if (Sem.is_location id) || (Sem.is_loc_spe id)  || (Sem.is_loc_mode id)
+			if (Sem.is_location id) || (Sem.is_loc_spe id $3)  || (Sem.is_loc_mode id)
 				then
 					eline (Irg.ITEMOF ((Sem.get_type_ident id), id, $3))
 				else

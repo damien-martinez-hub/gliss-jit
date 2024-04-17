@@ -266,13 +266,13 @@ type type_expr =
 
 
 (** Float type for IEEE-754 binary32 *)
-let ieee754_32 = FLOAT (8, 23)
+let ieee754_32 = FLOAT (23, 9)
 
 (** Float type for IEEE-754 binary64 *)
-let ieee754_64 = FLOAT (11, 52)
+let ieee754_64 = FLOAT (52, 12)
 
 (** Float type for IEEE-754 binary128 *)
-let ieee754_128 = FLOAT (15, 112)
+let ieee754_128 = FLOAT (112, 16)
 
 (** Default (integer) type. *)
 let default_int = INT(32)
@@ -2231,3 +2231,13 @@ let ends_with s ss =
 	let l = String.length s in
 	let ll = String.length ss in
 	(l >= ll) && ((String.sub s (l - ll) ll) = ss)
+
+
+(***** Predefined symbols *****)
+
+let _ =
+	let declare_type name t = 
+		add_symbol name (TYPE (name, t, [])) in
+	declare_type "ieee754_32" ieee754_32;
+	declare_type "ieee754_64" ieee754_64;
+	declare_type "ieee754_128" ieee754_128

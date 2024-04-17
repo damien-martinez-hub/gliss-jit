@@ -1332,7 +1332,7 @@ let rec is_loc_mode id =
 	@param id	the id to check
 	@return		True if the id refer to a parameter false otherwise
 *)
-let rec is_loc_spe id =
+let rec is_loc_spe id idx =
 	if not !gliss1_compat then false else
 	let sym = Irg.get_symbol id in
 	
@@ -1352,10 +1352,13 @@ let rec is_loc_spe id =
 	
 	match sym with
 	| PARAM (n, t)	->
+		if idx <> NONE
+		then error (fun out -> fprintf out "paramater \"%s\" cannot be indexed!" id)
+		else
 		let r = process_param n t in
-		if r && not (Irg.is_compat ()) then Printf.fprintf stderr
-			"WARNING:%s:%d: assignment to parameter \"%s\" is supported for compatibility purpose but is now deprecated!\n"
-			!Lexer.file !Lexer.line n;
+		if r && not (Irg.is_compat ()) then
+			Lexer.warn (fun out -> fprintf out
+				"assignment to parameter \"%s\" is supported for compatibility purpose but is now deprecated!" n);
 		r
 	| _				->
 		false
@@ -1910,7 +1913,7 @@ let make_concat_loc l1 l2 =
 	@return 	Built location . *)
 let make_access_loc id idx up lo =
 	let id = unalias_local id in
-	if (is_location id) || (is_loc_spe id)
+	if (is_location id) || (is_loc_spe id NONE)
 	then begin LOC_REF (get_loc_ref_type id, id, idx, up, lo) end
 	else begin pre_error (Printf.sprintf "'%s' is not a valid location" id) end
 

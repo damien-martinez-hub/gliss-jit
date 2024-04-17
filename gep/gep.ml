@@ -261,7 +261,6 @@ let output_decoder_complex info inst idx sfx size is_risc out =
 		let spec_params_name = List.map fst spec_params in
 		let output_expr e =
 			Irg.dump_type := true;
-			printf "DEBUG: %a\n" Irg.output_expr e;
 			let info = Toc.info () in
 			let o = info.Toc.out in
 			info.Toc.out <- out;
@@ -747,7 +746,6 @@ let find_mod m =
 		| path::tail ->
 			let path = Irg.native_path path in
 			let source_path = path ^ "/" ^ m.aname ^ ".c" in
-			printf "DEBUG: testing %s.\n" source_path;
 			if Sys.file_exists source_path then m.path <- path
 		else find_lib tail in
 

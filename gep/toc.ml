@@ -311,7 +311,9 @@ let rec convert_type t =
 		(* we have some of this type in bitfield expr, we can't determine the real type and mem size
 		so let's patch it up for the moment, uint32 should be the least worst choice *)
 		UINT32
-	| _ -> unsupported_type t
+	| _ ->
+		printf "DEBUG: unsupported %a\n" Irg.output_type_expr t;
+		unsupported_type t
 
 
 (** Compute the size of type in bits.
@@ -1545,7 +1547,7 @@ let rec gen_stat info stat =
 				if idx <> Irg.NONE then
 					(out "["; gen_expr info idx true; out "]");
 				out " = ";
-				gen_expr info (set_field info typ id idx lo up expr) true;
+				gen_expr info (if lo == Irg.NONE then expr else set_field info typ id idx lo up expr) true;
 				out ";"
 			| Irg.MEM (_, _, t, _) ->
 				out (Printf.sprintf "%s_mem_write%s(" info.proc

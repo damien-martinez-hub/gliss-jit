@@ -11,7 +11,7 @@ module = Extension(
 )
 
 setup(
-	name = "$(PROC)Lib",
+	name = "$(proc)gliss",
 	version = "1.0",
 	description = "$(PROC) emulation",
 	ext_modules = [module]

@@ -268,7 +268,8 @@ FloatType ::= 'float' '(' M: IntegerExpression ',' E: IntegerExpression ')'
 </code>
 
 IEEE-754 float and double types are represented, respectively, by
-''float(23, 9)'' and ''float(52, 12)''.
+''float(23, 9)'' and ''float(52, 12)'' and are also available as
+predefined symbols ''ieee754_32'' and ''ieee754_64''.
 
 ==== Range Type ====
 
