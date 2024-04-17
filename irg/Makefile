@@ -48,10 +48,11 @@ info:
 # generate config.ml
 VERSION=$(shell cat ../VERSION)
 config.ml: ../VERSION
-	echo "let install_dir = \"$(PREFIX)\"" > config.ml
-	echo "let source_dir = \"$(CURDIR)/..\"" >> config.ml
-	echo "let version = \"$(VERSION)\"" >> config.ml
-	if [ $(OCAML_VERSION) -ge 403 ]; then \
+	@echo "Generating config.ml"
+	@echo "let install_dir = \"$(PREFIX)\"" > config.ml
+	@echo "let source_dir = \"$(CURDIR)/..\"" >> config.ml
+	@echo "let version = \"$(VERSION)\"" >> config.ml
+	@if [ $(OCAML_VERSION) -ge 403 ]; then \
 		echo "let lowercase = String.lowercase_ascii" >> config.ml; \
 		echo "let uppercase = String.uppercase_ascii" >> config.ml; \
 		echo "let char_lowercase = Char.lowercase_ascii" >> config.ml; \
