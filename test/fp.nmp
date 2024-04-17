@@ -1,0 +1,63 @@
+
+let proc="mine"
+let gliss_isize = "16"
+let bit_order = "UPPERMOST"
+
+type index = card(4)
+
+reg PC[1, card(32)] pc=1
+reg D[16, ieee754_64]
+reg S[16, ieee754_32]
+
+macro FPNeg(x) = -(x)
+
+op init()
+	action = { }
+
+op instruction = dp | sp
+
+op dp(d: index, a: index, b: index)
+	image = format("0000 %4b %4b %4b", d, a, b)
+	syntax = format("add d%d, d%d, d%d", d, a, b)
+	action = {
+		let max = ieee754_64_max;
+		let min = ieee754_64_min;
+		let nan = ieee754_64_nan;
+		let inf = ieee754_64_inf;
+		let ninf = ieee754_64_ninf;
+		let pi = ieee754_64_pi;
+		D[d] = D[a] + D[b];
+		D[d] = D[a] - D[b];
+		D[d] = D[a] * D[b];
+		D[d] = D[a] / D[b];
+		if D[a] == D[b] then endif;
+		if D[a] != D[b] then endif;
+		if D[a] < D[b] then endif;
+		if D[a] <= D[b] then endif;
+		if D[a] > D[b] then endif;
+		if D[a] >= D[b] then endif;
+		let x = D[b]<63..0>;
+	}
+
+op sp(d: index, a: index, b: index)
+	image = format("0001 %4b %4b %4b", d, a, b)
+	syntax = format("add f%d, f%d, f%d", d, a, b)
+	action = {
+		let max = ieee754_32_max;
+		let min = ieee754_32_min;
+		let nan = ieee754_32_nan;
+		let inf = ieee754_32_inf;
+		let ninf = ieee754_32_ninf;
+		let pi = ieee754_32_pi;
+		F[d] = F[a] + F[b];
+		F[d] = F[a] - F[b];
+		F[d] = F[a] * F[b];
+		F[d] = F[a] / F[b];
+		if F[a] == F[b] then endif;
+		if F[a] != F[b] then endif;
+		if F[a] < F[b] then endif;
+		if F[a] <= F[b] then endif;
+		if F[a] > F[b] then endif;
+		if F[a] >= F[b] then endif;
+		let x = F[b]<63..0>;
+	}

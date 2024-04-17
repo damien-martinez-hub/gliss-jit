@@ -9,6 +9,9 @@ extern  "C"
 {
 #endif
 
+#include <float.h>
+#include <math.h>
+
 #include <$(proc)/api.h>
 #include <$(proc)/macros.h>
 #include <$(proc)/grt.h>

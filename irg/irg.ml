@@ -2240,4 +2240,21 @@ let _ =
 		add_symbol name (TYPE (name, t, [])) in
 	declare_type "ieee754_32" ieee754_32;
 	declare_type "ieee754_64" ieee754_64;
-	declare_type "ieee754_128" ieee754_128
+	declare_type "ieee754_128" ieee754_128;
+
+	let declare_float name t x =
+		add_symbol name (LET (name, t, FIXED_CONST x, [])) in
+	List.iter
+		(fun (id, x) ->
+			declare_float ("ieee754_32_" ^ id) ieee754_32 x;
+			declare_float ("ieee754_64_" ^ id) ieee754_64 x;
+		)
+		[
+			("max", Float.max_float);
+			("min", Float.min_float);
+			("inf", Float.infinity);
+			("ninf", Float.neg_infinity);
+			("nan", Float.nan);
+			("pi", Float.pi);
+			
+		]

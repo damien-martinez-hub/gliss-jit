@@ -1,0 +1,29 @@
+let proc = "test"
+let bit_order = "uppermost"
+let gliss_isize = "16"
+let* N: int(8) = 0
+
+reg PC[1, card(32)] pc = 1
+reg R[16, card(32)]
+reg IT[1, card(8)]
+
+mode empty() = IT == 0
+	image = ""
+	syntax = ""
+
+op instruction(x: all)
+  syntax = x.syntax
+  image = x.image
+  action = { x.action ; }
+  
+op all = add
+
+op add(d: card(4), a: card(4), b: card(4), m: empty)
+	image = format("0000 %4b %4b %4b %s", d, a, b, m)
+	syntax = format("add R%d, R%d, R%d", d, a, b)
+	action = {
+		if m then
+			R[d] = R[a] + R[b];
+		endif;
+	}
+

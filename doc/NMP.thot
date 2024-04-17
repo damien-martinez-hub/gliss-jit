@@ -271,6 +271,16 @@ IEEE-754 float and double types are represented, respectively, by
 ''float(23, 9)'' and ''float(52, 12)'' and are also available as
 predefined symbols ''ieee754_32'' and ''ieee754_64''.
 
+Convenient constants can also be used:
+
+| ''ieee754_32_max'' | ''ieee754_64_max'' | maximum value |
+| ''ieee754_32_min'' | ''ieee754_64_min'' | minimum value |
+| ''ieee754_32_nan'' | ''ieee754_64_nan'' | not a number |
+| ''ieee754_32_inf'' | ''ieee754_64_inf'' | positive infinity |
+| ''ieee754_32_ninf'' | ''ieee754_64_ninf'' | negatove infinity |
+| ''ieee754_32_pi'' | ''ieee754_64_pi'' | pi |
+
+
 ==== Range Type ====
 
 ''RangeType'' allows to define an integer value ranging from a lower

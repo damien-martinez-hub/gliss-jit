@@ -70,6 +70,17 @@ end
 module StringHashtbl = Hashtbl.Make(HashedString)
 
 
+(** List of special float values and the corresponding C constant. *)
+let special_floats = [
+	(Float.nan, "NAN");
+	(Float.infinity, "INFINITY");
+	(Float.neg_infinity, "-INFINITY");
+	(Float.max_float, "DBL_MAX");
+	(Float.min_float, "DBL_MIN");
+	(Float.pi, "M_PI")
+]
+
+
 (** Get a statement attribute.
 	@param name		Name of the attribute. *)
 let get_stat_attr name =
@@ -1168,7 +1179,11 @@ and gen_const info typ cst =
 		Printf.fprintf info.out "\"%s\"" (cstring s)
 	| _, Irg.CANON s ->
 		Printf.fprintf info.out "%s" (cstring s)
-	| _, Irg.FIXED_CONST v -> Printf.fprintf info.out "%f" v
+	| _, Irg.FIXED_CONST v ->
+		try
+			output_string info.out (List.assoc v special_floats)
+		with Not_found ->
+			fprintf info.out "%f" v
 
 
 (** Generate a reference to a state item.
