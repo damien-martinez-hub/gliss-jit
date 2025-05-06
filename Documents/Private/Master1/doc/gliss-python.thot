@@ -1,0 +1,51 @@
+====== Python Interface ======
+
+For an easier user of @(GLISS), a Python interface is now provided.
+To enable it, just use ''-python'' at ''gep'' invocation. This creates
+a directory named ''python'' that contains two files:
+  * ''python.c'' -- Python/C link code,
+  * ''setup.py'' -- Python module invocation.
+
+To install Python's module, call ''setup.py'' this way:
+<code sh>
+$ python3 setup.py install
+</code>
+
+To install it in the user directory, add the option ''--user''.
+
+After that, a module named ''XXXgliss'' is available. In the following,
+we use //arm// for //XXX// as an example. To use the module, in Python,
+type:
+<code python>
+import armgliss
+</code>
+
+To get the list of functions,
+<code python>
+dir(armgliss)
+</code>
+
+In fact,most of the functions available in @(GLISS) API are available extended with //loader// and //debug// functions. The interface of some functions are a bit changed to match more the Python programming model.
+
+To get the documentation of particular function, just type:
+<code python>
+armgliss.FUNCTION.__doc__
+</code>
+
+Below is an example of a program executing the first 10 instruction of the program ''sum.elf'':
+<code python>
+import armgliss as arm
+
+pf = arm.new_platform()
+arm.load_platform(pf, "sum.elf")
+state = arm.new_state(pf)
+sim = arm.new_sim(state, 0, 0)
+
+for i in range(0, 10):
+	inst = arm.next_inst(sim)
+	print(hex(arm.get_inst_addr(inst)), ':', arm.disasm(inst))
+	arm.free_inst(inst)
+	arm.step(sim)
+
+arm.delete_sim(sim)
+</code>
